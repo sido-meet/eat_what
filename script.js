@@ -44,14 +44,22 @@ document.addEventListener('DOMContentLoaded', () => {
         foodList.innerHTML = '';
         foods.forEach((food, index) => {
             const li = document.createElement('li');
-            li.textContent = food;
+            li.className = 'food-card';
             li.dataset.index = index;
 
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = '删除';
-            deleteButton.className = 'delete-button';
+            li.innerHTML = `
+                <div class="food-card-content">
+                    <strong class="food-name">${food.name}</strong>
+                    <div class="food-details">
+                        ${food.location ? `<span class="food-location">${food.location}</span>` : ''}
+                        <div class="tags">
+                            ${food.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+                <button class="delete-button">删除</button>
+            `;
             
-            li.appendChild(deleteButton);
             foodList.appendChild(li);
         });
     };
