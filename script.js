@@ -3,16 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
     const foodList = document.getElementById('food-list');
     const openTurntableButton = document.getElementById('open-turntable-button');
-
-    // New elements for Add Food Modal
-    const openAddFoodModalButton = document.getElementById('open-add-food-modal-button');
-    const addFoodModal = document.getElementById('add-food-modal');
-    const addFoodCloseButton = document.querySelector('.add-food-close-button');
-    const newFoodNameInput = document.getElementById('new-food-name');
-    const newFoodImageInput = document.getElementById('new-food-image');
-    const newFoodLocationInput = document.getElementById('new-food-location');
-    const newFoodTagsInput = document.getElementById('new-food-tags');
-    const confirmAddFoodButton = document.getElementById('confirm-add-food-button');
+    
+    const turntableModal = document.getElementById('turntable-modal');
+    const turntableCloseButton = document.querySelector('#turntable-modal .close-button');
+    const spinButton = document.getElementById('spin-button');
+    const turntable = document.getElementById('turntable');
+    const resultDisplay = document.getElementById('result');
 
     // --- State ---
     let foods = JSON.parse(localStorage.getItem('foods')) || [
@@ -218,16 +214,16 @@ document.addEventListener('DOMContentLoaded', () => {
     openTurntableButton.addEventListener('click', () => {
         updateTurntableAppearance();
         resultDisplay.textContent = '';
-        modal.classList.add('visible');
+        turntableModal.classList.add('visible');
     });
 
-    closeButton.addEventListener('click', () => {
-        modal.classList.remove('visible');
+    turntableCloseButton.addEventListener('click', () => {
+        turntableModal.classList.remove('visible');
     });
 
     window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.remove('visible');
+        if (e.target === turntableModal) {
+            turntableModal.classList.remove('visible');
         }
     });
 
