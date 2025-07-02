@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded.');
+
     // --- DOM Elements ---
     const searchInput = document.getElementById('search-input');
     const foodList = document.getElementById('food-list');
@@ -19,6 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const newFoodLocationInput = document.getElementById('new-food-location');
     const newFoodTagsInput = document.getElementById('new-food-tags');
     const confirmAddFoodButton = document.getElementById('confirm-add-food-button');
+
+    console.log('DOM Elements:', {
+        searchInput, foodList, openTurntableButton,
+        turntableModal, turntableCloseButton, spinButton, turntable, resultDisplay,
+        openAddFoodModalButton, addFoodModal, addFoodCloseButton,
+        newFoodNameInput, newFoodImageInput, newFoodLocationInput, newFoodTagsInput, confirmAddFoodButton
+    });
     
 
     // --- State ---
@@ -73,9 +82,114 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             ];
         }
+        console.log('Foods after loading:', foods);
         renderFoodList();
     };
 
-    // --- Initial Load ---
-    loadFoods();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadFoods();
+
+    // --- Event Listeners ---
+    openAddFoodModalButton.addEventListener('click', () => {
+        addFoodModal.style.display = 'block';
+    });
+
+    addFoodCloseButton.addEventListener('click', () => {
+        addFoodModal.style.display = 'none';
+    });
+
+    confirmAddFoodButton.addEventListener('click', () => {
+        const name = newFoodNameInput.value.trim();
+        const image = newFoodImageInput.value.trim();
+        const location = newFoodLocationInput.value.trim();
+        const tags = newFoodTagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+
+        if (name) {
+            addFood({ name, image, location, tags });
+            newFoodNameInput.value = '';
+            newFoodImageInput.value = '';
+            newFoodLocationInput.value = '';
+            newFoodTagsInput.value = '';
+            addFoodModal.style.display = 'none';
+        } else {
+            alert('美食名称是必填项！');
+        }
+    });
+
+    searchInput.addEventListener('input', filterFoods);
+
+    // Close modals if user clicks outside of them
+    window.addEventListener('click', (event) => {
+        if (event.target === addFoodModal) {
+            addFoodModal.style.display = 'none';
+        }
+        if (event.target === turntableModal) {
+            turntableModal.style.display = 'none';
+        }
+    });
+});
+
+/**
+ * Renders the list of foods to the DOM.
+ * @param {Array<Object>} [foodArray=foods] - The array of foods to render. Defaults to the global foods array.
+ */
+    const renderFoodList = () => {
+        console.log('Rendering food list...');
+        foodList.innerHTML = '';
+        foods.forEach((food, index) => {
+            const li = document.createElement('li');
+            li.className = 'food-card';
+            li.dataset.index = index;
+
+            const imageUrl = food.image || DEFAULT_FOOD_IMAGE;
+
+            li.innerHTML = `
+                <img src="${imageUrl}" alt="${food.name}" class="food-image">
+                <div class="food-card-content">
+                    <strong class="food-name">${food.name}</strong>
+                    <div class="food-details">
+                        ${food.location ? `<span class="food-location">${food.location}</span>` : ''}
+                        <div class="tags">
+                            ${food.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+                <button class="delete-button">删除</button>
+            `;
+            
+            foodList.appendChild(li);
+        });
+        console.log('Food list rendered.');
+    };
+
+/**
+ * Adds a new food item to the list and saves to localStorage.
+ * @param {Object} newFood - The new food object to add.
+ */
+const addFood = (newFood) => {
+    foods.push(newFood);
+    saveFoods();
+    renderFoodList();
+};
+
+/**
+ * Saves the current foods array to localStorage.
+ */
+const saveFoods = () => {
+    localStorage.setItem('foods', JSON.stringify(foods));
+};
+
+/**
+ * Filters the food list based on search input.
+ */
+const filterFoods = () => {
+    const searchTerm = searchInput.value.toLowerCase();
+    const filtered = foods.filter(food =>
+        food.name.toLowerCase().includes(searchTerm) ||
+        (food.location && food.location.toLowerCase().includes(searchTerm)) ||
+        (food.tags && food.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
+    );
+    renderFoodList(filtered);
+};
