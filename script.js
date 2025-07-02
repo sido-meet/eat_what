@@ -204,8 +204,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     foodList.addEventListener('click', (e) => {
         if (e.target.classList.contains('delete-button')) {
-            const index = e.target.parentElement.dataset.index;
-            deleteFood(index);
+            // Find the closest parent with class 'food-card' to get its dataset.index
+            const foodCard = e.target.closest('.food-card');
+            if (foodCard) {
+                const index = foodCard.dataset.index;
+                deleteFood(index);
+            }
         }
     });
 
