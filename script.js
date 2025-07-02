@@ -60,55 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFoodList();
     };
 
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadFoods();
-
-    // --- Event Listeners ---
-    openAddFoodModalButton.addEventListener('click', () => {
-        addFoodModal.style.display = 'block';
-    });
-
-    addFoodCloseButton.addEventListener('click', () => {
-        addFoodModal.style.display = 'none';
-    });
-
-    confirmAddFoodButton.addEventListener('click', () => {
-        const name = newFoodNameInput.value.trim();
-        const image = newFoodImageInput.value.trim();
-        const location = newFoodLocationInput.value.trim();
-        const tags = newFoodTagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
-
-        if (name) {
-            addFood({ name, image, location, tags });
-            newFoodNameInput.value = '';
-            newFoodImageInput.value = '';
-            newFoodLocationInput.value = '';
-            newFoodTagsInput.value = '';
-            addFoodModal.style.display = 'none';
-        } else {
-            alert('美食名称是必填项！');
-        }
-    });
-
-    searchInput.addEventListener('input', filterFoods);
-
-    // Close modals if user clicks outside of them
-    window.addEventListener('click', (event) => {
-        if (event.target === addFoodModal) {
-            addFoodModal.style.display = 'none';
-        }
-        if (event.target === turntableModal) {
-            turntableModal.style.display = 'none';
-        }
-    });
-});
-
-/**
- * Renders the list of foods to the DOM.
- * @param {Array<Object>} [foodArray=foods] - The array of foods to render. Defaults to the global foods array.
- */
+    /**
+     * Renders the food list to the UI
+     */
     const renderFoodList = () => {
         console.log('Rendering food list...');
         foodList.innerHTML = '';
@@ -138,10 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Food list rendered.');
     };
 
-/**
- * Adds a new food item to the list and saves to localStorage.
- * @param {Object} newFood - The new food object to add.
- */
+    /**
+     * Adds a new food item to the list.
+     */
     const addFood = async () => {
         const newFoodName = newFoodNameInput.value.trim();
         const newFoodImage = newFoodImageInput.value.trim();
@@ -182,22 +135,181 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-/**
- * Saves the current foods array to localStorage.
- */
-const saveFoods = () => {
-    localStorage.setItem('foods', JSON.stringify(foods));
-};
+    /**
+     * Deletes a food item
+     */
+    const deleteFood = async (index) => {
+        const foodToDelete = foods[index];
+        if (!foodToDelete || !foodToDelete.id) {
+            console.error('Food to delete or its ID is missing.', foodToDelete);
+            alert('无法删除美食：美食信息不完整。');
+            return;
+        }
 
-/**
- * Filters the food list based on search input.
- */
-const filterFoods = () => {
-    const searchTerm = searchInput.value.toLowerCase();
-    const filtered = foods.filter(food =>
-        food.name.toLowerCase().includes(searchTerm) ||
-        (food.location && food.location.toLowerCase().includes(searchTerm)) ||
-        (food.tags && food.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
-    );
-    renderFoodList(filtered);
-};
+        try {
+            const response = await fetch(`http://localhost:3000/api/foods/${foodToDelete.id}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+
+            foods.splice(index, 1);
+            renderFoodList();
+            alert('美食删除成功！');
+        } catch (error) {
+            console.error('Error deleting food:', error);
+            alert(`删除美食失败: ${error.message}`);
+        }
+    };
+
+    /**
+     * Filters the food list based on search input
+     */
+    const filterList = () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const listItems = foodList.querySelectorAll('.food-card');
+        listItems.forEach(item => {
+            const foodName = item.querySelector('.food-name').textContent.toLowerCase();
+            if (foodName.includes(searchTerm)) {
+                item.classList.remove('hidden');
+            } else {
+                item.classList.add('hidden');
+            }
+        });
+    };
+
+    /**
+     * Updates the turntable's visual appearance based on the food list
+     */
+    const updateTurntableAppearance = () => {
+        const itemCount = foods.length;
+        if (itemCount === 0) return;
+        const angleStep = 360 / itemCount;
+        const colors = ['#ffadad', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#a0c4ff', '#bdb2ff', '#ffc6ff'];
+        
+        let gradient = 'conic-gradient(';
+        foods.forEach((food, i) => {
+            const startAngle = i * angleStep;
+            const endAngle = (i + 1) * angleStep;
+            gradient += `${colors[i % colors.length]} ${startAngle}deg ${endAngle}deg`;
+            if (i < itemCount - 1) {
+                gradient += ', ';
+            }
+        });
+        gradient += ')';
+        turntable.style.transform = `rotate(${currentRotation}deg)`;
+
+        // Clear existing labels
+        const existingLabels = turntable.querySelectorAll('.food-label');
+        existingLabels.forEach(label => label.remove());
+
+        // Add new labels
+        foods.forEach((food, i) => {
+            const angle = (i + 0.5) * angleStep;
+            const label = document.createElement('div');
+            label.className = 'food-label';
+            label.textContent = food.name;
+            
+            const radius = turntable.offsetWidth / 2 - 30; // Adjust as needed
+            const x = radius * Math.cos(angle * Math.PI / 180);
+            const y = radius * Math.sin(angle * Math.PI / 180);
+            
+            label.style.transform = `translate(${x}px, ${y}px) rotate(${angle + 90}deg)`;
+            turntable.appendChild(label);
+        });
+    };
+
+    /**
+     * Spins the turntable to a random item
+     */
+    const spinTurntable = () => {
+        if (foods.length === 0) {
+            resultDisplay.textContent = '列表是空的，快去添加吧！';
+            return;
+        }
+
+        resultDisplay.textContent = '...';
+        spinButton.disabled = true;
+
+        const randomIndex = Math.floor(Math.random() * foods.length);
+        const selectedFood = foods[randomIndex];
+        const degreesPerItem = 360 / foods.length;
+        // Calculate rotation to point to the middle of the slice
+        const targetRotation = 360 * 5 + (360 - (randomIndex * degreesPerItem + degreesPerItem / 2));
+        
+        currentRotation = targetRotation;
+        turntable.style.transform = `rotate(${currentRotation}deg)`;
+
+        setTimeout(() => {
+            resultDisplay.textContent = `结果: ${selectedFood.name}`;
+            spinButton.disabled = false;
+        }, 4000); // Corresponds to the transition duration in CSS
+    };
+
+    // --- Event Listeners ---
+
+    foodList.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-button')) {
+            // Find the closest parent with class 'food-card' to get its dataset.index
+            const foodCard = e.target.closest('.food-card');
+            if (foodCard) {
+                const index = foodCard.dataset.index;
+                deleteFood(index);
+            }
+        }
+    });
+
+    searchInput.addEventListener('input', filterList);
+
+    openTurntableButton.addEventListener('click', () => {
+        updateTurntableAppearance();
+        resultDisplay.textContent = '';
+        turntableModal.classList.add('visible');
+    });
+
+    turntableCloseButton.addEventListener('click', () => {
+        turntableModal.classList.remove('visible');
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === turntableModal) {
+            turntableModal.classList.remove('visible');
+        }
+    });
+
+    spinButton.addEventListener('click', spinTurntable);
+
+    // Add Food Modal Event Listeners
+    if (openAddFoodModalButton) {
+        openAddFoodModalButton.addEventListener('click', () => {
+            if (addFoodModal) {
+                addFoodModal.classList.add('visible');
+            }
+        });
+    }
+
+    if (addFoodCloseButton) {
+        addFoodCloseButton.addEventListener('click', () => {
+            if (addFoodModal) {
+                addFoodModal.classList.remove('visible');
+            }
+        });
+    }
+
+    if (confirmAddFoodButton) {
+        confirmAddFoodButton.addEventListener('click', addFood);
+    }
+
+    // Close add food modal when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === addFoodModal) {
+            addFoodModal.classList.remove('visible');
+        }
+    });
+
+    // --- Initial Load ---
+    loadFoods();
+});
