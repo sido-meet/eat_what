@@ -133,7 +133,8 @@ p {
     font-size: 0.8em;
 }
 
-.delete-button {
+.delete-button,
+.edit-button {
     background: #dc3545;
     color: white;
     border: none;
@@ -145,8 +146,17 @@ p {
     width: 100%; /* Make delete button full width */
 }
 
+.edit-button {
+    background: #007bff; /* Blue for edit button */
+    margin-left: 0; /* Remove left margin for edit button */
+}
+
 .delete-button:hover {
     background: #c82333;
+}
+
+.edit-button:hover {
+    background: #0056b3;
 }
 
 /* 操作区 */
