@@ -61,6 +61,34 @@ app.delete('/api/foods/:id', (req, res) => {
     });
 });
 
+// PUT (update) a food by ID
+app.put('/api/foods/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, image, location, tags } = req.body;
+
+    if (!name) {
+        return res.status(400).json({ error: 'Food name is required.' });
+    }
+
+    const tagsString = JSON.stringify(tags || []);
+
+    db.run(
+        'UPDATE foods SET name = ?, image = ?, location = ?, tags = ? WHERE id = ?',
+        [name, image, location, tagsString, id],
+        function(err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            if (this.changes === 0) {
+                res.status(404).json({ message: 'Food not found.' });
+            } else {
+                res.json({ id, name, image, location, tags });
+            }
+        }
+    );
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
