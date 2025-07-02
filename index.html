@@ -13,8 +13,7 @@
         <p>苏州大学天赐庄校区版</p>
 
         <div class="input-section">
-            <input type="text" id="food-input" placeholder="输入新的美食...">
-            <button id="add-button">添加</button>
+            <button id="open-add-food-modal-button">添加新美食</button>
         </div>
 
         <div class="list-section">
@@ -26,6 +25,31 @@
 
         <div class="action-section">
             <button id="open-turntable-button">开始选择！</button>
+        </div>
+    </div>
+
+    <!-- 添加美食弹窗 (默认隐藏) -->
+    <div id="add-food-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button add-food-close-button">&times;</span>
+            <h2>添加新美食</h2>
+            <div class="form-group">
+                <label for="new-food-name">美食名称:</label>
+                <input type="text" id="new-food-name" placeholder="例如：兰州拉面">
+            </div>
+            <div class="form-group">
+                <label for="new-food-image">图片URL (可选):</label>
+                <input type="text" id="new-food-image" placeholder="例如：http://example.com/image.jpg">
+            </div>
+            <div class="form-group">
+                <label for="new-food-location">位置 (可选):</label>
+                <input type="text" id="new-food-location" placeholder="例如：东吴面馆旁边">
+            </div>
+            <div class="form-group">
+                <label for="new-food-tags">标签 (可选，逗号分隔):</label>
+                <input type="text" id="new-food-tags" placeholder="例如：面食, 清真">
+            </div>
+            <button id="confirm-add-food-button">添加美食</button>
         </div>
     </div>
 
