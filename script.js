@@ -13,7 +13,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultDisplay = document.getElementById('result');
 
     // --- State ---
-    let foods = JSON.parse(localStorage.getItem('foods')) || ['兰州拉面', '东吴面馆', '肯德基', '汉堡王', '藏书羊肉', '次坞打面', '麻辣烫', '香锅'];
+    let foods = JSON.parse(localStorage.getItem('foods')) || [
+        {
+            name: '兰州拉面',
+            image: '',
+            location: '东吴面馆旁边',
+            tags: ['清真', '面食']
+        },
+        {
+            name: '东吴面馆',
+            image: '',
+            location: '兰州拉面旁边',
+            tags: ['苏式', '面食']
+        },
+        {
+            name: '肯德基',
+            image: '',
+            location: '校门口',
+            tags: ['快餐', '炸鸡']
+        }
+    ];
     let currentRotation = 0;
 
     // --- Functions ---
