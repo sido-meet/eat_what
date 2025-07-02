@@ -105,9 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     const filterList = () => {
         const searchTerm = searchInput.value.toLowerCase();
-        const listItems = foodList.querySelectorAll('li');
+        const listItems = foodList.querySelectorAll('.food-card');
         listItems.forEach(item => {
-            const foodName = item.textContent.replace('删除', '').toLowerCase();
+            const foodName = item.querySelector('.food-name').textContent.toLowerCase();
             if (foodName.includes(searchTerm)) {
                 item.classList.remove('hidden');
             } else {
