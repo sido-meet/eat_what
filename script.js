@@ -45,6 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
     let currentRotation = 0;
 
+    const DEFAULT_FOOD_IMAGE = 'https://via.placeholder.com/150?text=No+Image'; // Default image URL
+
     // --- Functions ---
 
     /**
@@ -57,7 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
             li.className = 'food-card';
             li.dataset.index = index;
 
+            const imageUrl = food.image || DEFAULT_FOOD_IMAGE;
+
             li.innerHTML = `
+                <img src="${imageUrl}" alt="${food.name}" class="food-image">
                 <div class="food-card-content">
                     <strong class="food-name">${food.name}</strong>
                     <div class="food-details">
