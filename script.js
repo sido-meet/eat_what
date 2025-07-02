@@ -142,11 +142,45 @@ document.addEventListener('DOMContentLoaded', () => {
  * Adds a new food item to the list and saves to localStorage.
  * @param {Object} newFood - The new food object to add.
  */
-const addFood = (newFood) => {
-    foods.push(newFood);
-    saveFoods();
-    renderFoodList();
-};
+    const addFood = async () => {
+        const newFoodName = newFoodNameInput.value.trim();
+        const newFoodImage = newFoodImageInput.value.trim();
+        const newFoodLocation = newFoodLocationInput.value.trim();
+        const newFoodTags = newFoodTagsInput.value.trim().split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+
+        if (!newFoodName) {
+            alert('美食名称不能为空！');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/api/foods', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: newFoodName, image: newFoodImage, location: newFoodLocation, tags: newFoodTags })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+            }
+
+            const addedFood = await response.json();
+            foods.push(addedFood);
+            renderFoodList();
+            addFoodModal.classList.remove('visible'); // Close modal after adding
+            // Clear input fields
+            newFoodNameInput.value = '';
+            newFoodImageInput.value = '';
+            newFoodLocationInput.value = '';
+            newFoodTagsInput.value = '';
+        } catch (error) {
+            console.error('Error adding food:', error);
+            alert(`添加美食失败: ${error.message}`);
+        }
+    };
 
 /**
  * Saves the current foods array to localStorage.
