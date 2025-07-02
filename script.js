@@ -11,6 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultDisplay = document.getElementById('result');
 
     // New elements for Add Food Modal
+    const openAddFoodModalButton = document.getElementById('open-add-food-modal-button');
+    const addFoodModal = document.getElementById('add-food-modal');
+    const addFoodCloseButton = document.querySelector('.add-food-close-button');
+    const newFoodNameInput = document.getElementById('new-food-name');
+    const newFoodImageInput = document.getElementById('new-food-image');
+    const newFoodLocationInput = document.getElementById('new-food-location');
+    const newFoodTagsInput = document.getElementById('new-food-tags');
+    const confirmAddFoodButton = document.getElementById('confirm-add-food-button');
     
 
     // --- State ---
