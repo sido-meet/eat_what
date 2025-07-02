@@ -12,6 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const turntable = document.getElementById('turntable');
     const resultDisplay = document.getElementById('result');
 
+    // New elements for Add Food Modal
+    const openAddFoodModalButton = document.getElementById('open-add-food-modal-button');
+    const addFoodModal = document.getElementById('add-food-modal');
+    const addFoodCloseButton = document.querySelector('.add-food-close-button');
+    const newFoodNameInput = document.getElementById('new-food-name');
+    const newFoodImageInput = document.getElementById('new-food-image');
+    const newFoodLocationInput = document.getElementById('new-food-location');
+    const newFoodTagsInput = document.getElementById('new-food-tags');
+    const confirmAddFoodButton = document.getElementById('confirm-add-food-button');
+
     // --- State ---
     let foods = JSON.parse(localStorage.getItem('foods')) || [
         {
@@ -75,17 +85,26 @@ document.addEventListener('DOMContentLoaded', () => {
      * Adds a new food item
      */
     const addFood = () => {
-        const newFoodName = foodInput.value.trim();
+        const newFoodName = newFoodNameInput.value.trim();
+        const newFoodImage = newFoodImageInput.value.trim();
+        const newFoodLocation = newFoodLocationInput.value.trim();
+        const newFoodTags = newFoodTagsInput.value.trim().split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+
         if (newFoodName && !foods.some(food => food.name === newFoodName)) {
             foods.push({
                 name: newFoodName,
-                image: '',
-                location: '', // 可以留空或提供默认值
-                tags: []      // 可以留空或提供默认值
+                image: newFoodImage,
+                location: newFoodLocation,
+                tags: newFoodTags
             });
             saveFoods();
             renderFoodList();
-            foodInput.value = '';
+            addFoodModal.classList.remove('visible'); // Close modal after adding
+            // Clear input fields
+            newFoodNameInput.value = '';
+            newFoodImageInput.value = '';
+            newFoodLocationInput.value = '';
+            newFoodTagsInput.value = '';
         } else if (foods.some(food => food.name === newFoodName)) {
             alert('这个已经添加过了！');
         }
@@ -185,12 +204,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Event Listeners ---
-    addButton.addEventListener('click', addFood);
-    foodInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            addFood();
-        }
-    });
+    // addButton.addEventListener('click', addFood); // Removed old add button
+    // foodInput.addEventListener('keypress', (e) => { // Removed old food input
+    //     if (e.key === 'Enter') {
+    //         addFood();
+    //     }
+    // });
 
     foodList.addEventListener('click', (e) => {
         if (e.target.classList.contains('delete-button')) {
@@ -218,6 +237,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     spinButton.addEventListener('click', spinTurntable);
+
+    // Add Food Modal Event Listeners
+    openAddFoodModalButton.addEventListener('click', () => {
+        addFoodModal.classList.add('visible');
+    });
+
+    addFoodCloseButton.addEventListener('click', () => {
+        addFoodModal.classList.remove('visible');
+    });
+
+    confirmAddFoodButton.addEventListener('click', addFood);
+
+    // Close add food modal when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === addFoodModal) {
+            addFoodModal.classList.remove('visible');
+        }
+    });
 
     // --- Initial Load ---
     renderFoodList();
