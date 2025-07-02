@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
 
     // --- State ---
-    let foods = []; // Initialize as empty, will be loaded from JSON or localStorage
+    let foods = []; // Initialize as empty, will be loaded from API
     let currentRotation = 0;
 
     const DEFAULT_FOOD_IMAGE = 'https://via.placeholder.com/150?text=No+Image'; // Default image URL
@@ -39,50 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Functions ---
 
     /**
-     * Loads food data from foods.json or localStorage
+     * Loads food data from the backend API
      */
     const loadFoods = async () => {
         try {
-            const response = await fetch('data/foods.json');
+            console.log('Fetching foods from API...');
+            const response = await fetch('http://localhost:3000/api/foods');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            const jsonFoods = await response.json();
-            foods = jsonFoods;
-            // If localStorage has data, merge it or prioritize it
-            const localFoods = JSON.parse(localStorage.getItem('foods'));
-            if (localFoods && localFoods.length > 0) {
-                // Simple merge: add local foods not present in JSON
-                localFoods.forEach(localFood => {
-                    if (!foods.some(food => food.name === localFood.name)) {
-                        foods.push(localFood);
-                    }
-                });
-            }
+            const apiFoods = await response.json();
+            foods = apiFoods;
+            console.log('Foods loaded from API:', foods);
         } catch (error) {
-            console.error('Could not load foods from JSON, falling back to localStorage or default:', error);
-            foods = JSON.parse(localStorage.getItem('foods')) || [
-                {
-                    name: '兰州拉面',
-                    image: '',
-                    location: '东吴面馆旁边',
-                    tags: ['清真', '面食']
-                },
-                {
-                    name: '东吴面馆',
-                    image: '',
-                    location: '兰州拉面旁边',
-                    tags: ['苏式', '面食']
-                },
-                {
-                    name: '肯德基',
-                    image: '',
-                    location: '校门口',
-                    tags: ['快餐', '炸鸡']
-                }
-            ];
+            console.error('Could not load foods from API:', error);
+            // Fallback to an empty array or display an error message to the user
+            foods = []; 
+            alert('无法加载美食数据，请检查后端服务是否运行。');
         }
-        console.log('Foods after loading:', foods);
         renderFoodList();
     };
 
