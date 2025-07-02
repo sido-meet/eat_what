@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         turntable.style.transform = `rotate(${currentRotation}deg)`;
 
         setTimeout(() => {
-            resultDisplay.textContent = `结果: ${selectedFood}`;
+            resultDisplay.textContent = `结果: ${selectedFood.name}`;
             spinButton.disabled = false;
         }, 4000); // Corresponds to the transition duration in CSS
     };
