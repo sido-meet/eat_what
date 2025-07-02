@@ -136,6 +136,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         gradient += ')';
         turntable.style.background = gradient;
+
+        // Clear existing labels
+        const existingLabels = turntable.querySelectorAll('.food-label');
+        existingLabels.forEach(label => label.remove());
+
+        // Add new labels
+        foods.forEach((food, i) => {
+            const angle = (i + 0.5) * angleStep;
+            const label = document.createElement('div');
+            label.className = 'food-label';
+            label.textContent = food.name;
+            
+            const radius = turntable.offsetWidth / 2 - 30; // Adjust as needed
+            const x = radius * Math.cos(angle * Math.PI / 180);
+            const y = radius * Math.sin(angle * Math.PI / 180);
+            
+            label.style.transform = `translate(${x}px, ${y}px) rotate(${angle + 90}deg)`;
+            turntable.appendChild(label);
+        });
     };
 
     /**
