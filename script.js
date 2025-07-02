@@ -1,16 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
-    const foodInput = document.getElementById('food-input');
-    const addButton = document.getElementById('add-button');
     const searchInput = document.getElementById('search-input');
     const foodList = document.getElementById('food-list');
     const openTurntableButton = document.getElementById('open-turntable-button');
-    
-    const modal = document.getElementById('turntable-modal');
-    const closeButton = document.querySelector('.close-button');
-    const spinButton = document.getElementById('spin-button');
-    const turntable = document.getElementById('turntable');
-    const resultDisplay = document.getElementById('result');
 
     // New elements for Add Food Modal
     const openAddFoodModalButton = document.getElementById('open-add-food-modal-button');
@@ -209,12 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Event Listeners ---
-    // addButton.addEventListener('click', addFood); // Removed old add button
-    // foodInput.addEventListener('keypress', (e) => { // Removed old food input
-    //     if (e.key === 'Enter') {
-    //         addFood();
-    //     }
-    // });
 
     foodList.addEventListener('click', (e) => {
         if (e.target.classList.contains('delete-button')) {
