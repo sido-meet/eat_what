@@ -21,6 +21,7 @@ export const renderFoodList = (foods, foodListElement, deleteCallback) => {
                 </div>
             </div>
             <button class="delete-button">删除</button>
+            <button class="edit-button">编辑</button>
         `;
         
         foodListElement.appendChild(li);

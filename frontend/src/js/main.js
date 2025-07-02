@@ -1,4 +1,4 @@
-import { fetchFoods, addFood, deleteFood } from './api.js';
+import { fetchFoods, addFood, deleteFood, updateFood } from './api.js';
 import { renderFoodList, filterFoodList, updateTurntableAppearance, spinTurntable, showModal, hideModal } from './ui.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,6 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const newFoodTagsInput = document.getElementById('new-food-tags');
     const confirmAddFoodButton = document.getElementById('confirm-add-food-button');
 
+    // Elements for Edit Food Modal
+    const editFoodModal = document.getElementById('edit-food-modal');
+    const editFoodCloseButton = document.querySelector('.edit-food-close-button');
+    const editFoodIdInput = document.getElementById('edit-food-id');
+    const editFoodNameInput = document.getElementById('edit-food-name');
+    const editFoodImageInput = document.getElementById('edit-food-image');
+    const editFoodLocationInput = document.getElementById('edit-food-location');
+    const editFoodTagsInput = document.getElementById('edit-food-tags');
+    const confirmEditFoodButton = document.getElementById('confirm-edit-food-button');
+
     // --- State ---
     let foods = []; // Initialize as empty, will be loaded from API
 
@@ -32,7 +42,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadAndRenderFoods = async () => {
         foods = await fetchFoods();
-        renderFoodList(foods, foodList, handleDeleteFood);
+        renderFoodList(foods, foodList);
+    };
+
+    const openEditFoodModal = (food) => {
+        editFoodIdInput.value = food.id;
+        editFoodNameInput.value = food.name;
+        editFoodImageInput.value = food.image || '';
+        editFoodLocationInput.value = food.location || '';
+        editFoodTagsInput.value = food.tags.join(', ');
+        showModal(editFoodModal);
+    };
+
+    const handleEditFood = async () => {
+        const foodId = editFoodIdInput.value;
+        const updatedFoodName = editFoodNameInput.value.trim();
+        const updatedFoodImage = editFoodImageInput.value.trim();
+        const updatedFoodLocation = editFoodLocationInput.value.trim();
+        const updatedFoodTags = editFoodTagsInput.value.trim().split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+
+        if (!updatedFoodName) {
+            alert('美食名称不能为空！');
+            return;
+        }
+
+        try {
+            await updateFood(foodId, { name: updatedFoodName, image: updatedFoodImage, location: updatedFoodLocation, tags: updatedFoodTags });
+            hideModal(editFoodModal);
+            loadAndRenderFoods(); // Reload and render foods after updating
+        } catch (error) {
+            console.error('Failed to update food in main.js:', error);
+        }
     };
 
     const handleAddFood = async () => {
@@ -83,7 +123,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Listeners ---
 
-    foodList.addEventListener('click', handleDeleteFood);
+    foodList.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-button')) {
+            handleDeleteFood(e);
+        } else if (e.target.classList.contains('edit-button')) {
+            const foodCard = e.target.closest('.food-card');
+            if (foodCard) {
+                const foodId = foodCard.dataset.id;
+                const foodToEdit = foods.find(food => food.id == foodId);
+                if (foodToEdit) {
+                    openEditFoodModal(foodToEdit);
+                }
+            }
+        }
+    });
 
     searchInput.addEventListener('input', () => filterFoodList(searchInput, foodList));
 
@@ -100,6 +153,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('click', (e) => {
         if (e.target === turntableModal) {
             hideModal(turntableModal);
+        } else if (e.target === addFoodModal) {
+            hideModal(addFoodModal);
+        } else if (e.target === editFoodModal) {
+            hideModal(editFoodModal);
         }
     });
 
@@ -122,12 +179,16 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmAddFoodButton.addEventListener('click', handleAddFood);
     }
 
-    // Close add food modal when clicking outside
-    window.addEventListener('click', (e) => {
-        if (e.target === addFoodModal) {
-            hideModal(addFoodModal);
-        }
-    });
+    // Edit Food Modal Event Listeners
+    if (editFoodCloseButton) {
+        editFoodCloseButton.addEventListener('click', () => {
+            hideModal(editFoodModal);
+        });
+    }
+
+    if (confirmEditFoodButton) {
+        confirmEditFoodButton.addEventListener('click', handleEditFood);
+    }
 
     // --- Initial Load ---
     loadAndRenderFoods();
