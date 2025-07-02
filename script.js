@@ -75,13 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
      * Adds a new food item
      */
     const addFood = () => {
-        const newFood = foodInput.value.trim();
-        if (newFood && !foods.includes(newFood)) {
-            foods.push(newFood);
+        const newFoodName = foodInput.value.trim();
+        if (newFoodName && !foods.some(food => food.name === newFoodName)) {
+            foods.push({
+                name: newFoodName,
+                image: '',
+                location: '', // 可以留空或提供默认值
+                tags: []      // 可以留空或提供默认值
+            });
             saveFoods();
             renderFoodList();
             foodInput.value = '';
-        } else if (foods.includes(newFood)) {
+        } else if (foods.some(food => food.name === newFoodName)) {
             alert('这个已经添加过了！');
         }
     };
