@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const DB_PATH = path.resolve(__dirname, 'foods.db');
-const JSON_FOODS_PATH = path.resolve(__dirname, '../data/foods.json');
+const JSON_FOODS_PATH = path.resolve(__dirname, '../../data/foods.json');
 
 const db = new sqlite3.Database(DB_PATH, (err) => {
     if (err) {

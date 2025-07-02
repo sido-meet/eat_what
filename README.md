@@ -24,6 +24,37 @@
 *   **Express.js:** 用于构建 RESTful API 的 Web 框架。
 *   **SQLite:** 轻量级文件型数据库，用于存储美食数据。
 
+## 项目结构
+
+```
+/eat_what/
+├── frontend/             # 前端应用
+│   ├── index.html
+│   ├── package.json
+│   └── src/
+│       ├── assets/
+│       │   └── styles/   # CSS 样式文件
+│       │       └── main.css
+│       └── js/           # JavaScript 模块
+│           ├── api.js    # 处理对后端 API 的请求
+│           ├── main.js   # 应用入口，事件监听
+│           └── ui.js     # 负责所有 DOM 操作和界面更新
+│
+├── backend/              # 后端 API 服务
+│   ├── package.json
+│   ├── server.js         # Express 服务器核心配置
+│   ├── database.js       # 数据库连接和初始化
+│   ├── foods.db          # SQLite 数据库文件
+│   └── api/
+│       ├── routes/       # API 路由定义
+│       │   └── foodRoutes.js
+│       └── controllers/  # 业务逻辑处理
+│           └── foodController.js
+│
+└── data/                 # 初始数据文件
+    └── foods.json
+```
+
 ## 设置与运行
 
 请按照以下步骤设置并运行项目。
@@ -35,40 +66,34 @@ git clone <your-repository-url>
 cd eat_what
 ```
 
-### 2. 后端设置
+### 2. 后端设置与启动
 
 进入 `backend` 目录，安装依赖并启动服务器。
 
 ```bash
 cd backend
 npm install
-node server.js
-# 或者使用 npm start (如果 package.json 中有配置)
+npm start # 或者 node server.js
 ```
 
 后端服务器将会在 `http://localhost:3000` 运行。
 
 **注意:** 首次运行后端时，`foods.db` 数据库文件将自动创建，并从 `data/foods.json` 导入初始美食数据。
 
-### 3. 前端运行
+### 3. 前端设置与启动
 
-前端是纯静态文件，可以直接在浏览器中打开 `index.html` 文件。
-
-```bash
-# 在项目根目录
-open index.html # macOS
-start index.html # Windows
-x-www-browser index.html # Linux
-```
-
-或者，您可以使用一个简单的 HTTP 服务器来提供静态文件，例如 `http-server`：
+进入 `frontend` 目录，安装依赖并启动前端服务。我们推荐使用 `live-server` 来提供静态文件服务。
 
 ```bash
-npm install -g http-server # 如果尚未安装
-http-server .
+# 如果尚未安装 live-server，请先全局安装：
+npm install -g live-server
+
+cd frontend
+npm install
+npm start # 或者 live-server --port=8080
 ```
 
-然后通过浏览器访问 `http://localhost:8080` (或 `http-server` 提示的端口)。
+前端应用将会在 `http://localhost:8080` 运行，并在浏览器中自动打开。
 
 ## 使用说明
 
