@@ -66,34 +66,18 @@ git clone <your-repository-url>
 cd eat_what
 ```
 
-### 2. 后端设置与启动
+### 2. 启动项目
 
-进入 `backend` 目录，安装依赖并启动服务器。
+在项目根目录 (`/eat_what/`) 下，运行以下命令来同时启动前端和后端服务：
 
 ```bash
-cd backend
-npm install
-npm start # 或者 node server.js
+npm install # 安装根目录依赖，主要是 concurrently
+npm run start-all
 ```
 
-后端服务器将会在 `http://localhost:3000` 运行。
+`start-all` 脚本会同时启动后端服务器（在 `http://localhost:3000`）和前端服务（在 `http://localhost:8080`）。
 
 **注意:** 首次运行后端时，`foods.db` 数据库文件将自动创建，并从 `data/foods.json` 导入初始美食数据。
-
-### 3. 前端设置与启动
-
-进入 `frontend` 目录，安装依赖并启动前端服务。我们推荐使用 `live-server` 来提供静态文件服务。
-
-```bash
-# 如果尚未安装 live-server，请先全局安装：
-npm install -g live-server
-
-cd frontend
-npm install
-npm start # 或者 live-server --port=8080
-```
-
-前端应用将会在 `http://localhost:8080` 运行，并在浏览器中自动打开。
 
 ## 使用说明
 

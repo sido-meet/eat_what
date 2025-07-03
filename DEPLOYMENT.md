@@ -23,45 +23,31 @@
     });
     ```
 
-#### **第二阶段：启动后端服务 (无需 sudo)**
+#### **第二阶段：启动应用服务 (无需 sudo)**
 
 1.  **在你的 Linux 电脑上，打开终端。**
-2.  **进入 `backend` 目录：**
+2.  **进入项目根目录：**
     ```bash
-    cd /home/sido/projects/eat_what/backend
+    cd /home/sido/projects/eat_what/
     ```
-3.  **安装依赖（如果尚未安装）：**
-    ```bash
-    npm install
-    ```
-4.  **启动后端服务并使其在后台运行：**
-    使用 `nohup` 命令可以在你关闭终端后，进程仍然继续运行。
-    ```bash
-    nohup node server.js &
-    ```
-    *   `nohup`：防止进程在终端关闭时终止。
-    *   `&`：将进程放到后台运行。
-    *   你可以在当前目录下找到 `nohup.out` 文件，其中包含了服务器的日志输出。
-
-#### **第三阶段：启动前端服务 (无需 sudo)**
-
-你的前端 `frontend/package.json` 中已经配置了 `npm start` 脚本来运行 `live-server`。我们将利用这一点。
-
-1.  **在你的 Linux 电脑上，打开一个新的终端窗口。**
-2.  **进入 `frontend` 目录：**
-    ```bash
-    cd /home/sido/projects/eat_what/frontend
-    ```
-3.  **安装依赖（如果尚未安装）：**
+3.  **安装根目录依赖（主要是 `concurrently`，如果尚未安装）：**
     ```bash
     npm install
     ```
-4.  **启动前端服务并使其在后台运行：**
+4.  **启动前端和后端服务：**
     ```bash
-    nohup npm start &
+    npm run start-all
     ```
-    *   `npm start` 会执行 `live-server --port=8080`。
-    *   同样，日志会输出到 `nohup.out` 文件。
+    *   这个命令会同时启动后端服务（通常在 `http://0.0.0.0:3000`）和前端服务（通常在 `http://0.0.0.0:8080`）。
+    *   `concurrently` 会将两个服务的日志输出到同一个终端。如果你想在后台运行，并将所有输出保存到日志文件，可以使用：
+        ```bash
+        nohup npm run start-all > app.log 2>&1 &
+        ```
+        *   `nohup`：防止进程在终端关闭时终止。
+        *   `>` `app.log`：将标准输出重定向到 `app.log` 文件。
+        *   `2>&1`：将标准错误输出也重定向到标准输出（即 `app.log`）。
+        *   `&`：将进程放到后台运行。
+        *   你可以在项目根目录下找到 `app.log` 文件，其中包含了服务器的日志输出。
 
 #### **第四阶段：防火墙设置 (可能需要 sudo)**
 
