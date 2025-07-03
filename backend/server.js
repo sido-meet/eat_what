@@ -13,7 +13,9 @@ app.use(express.json()); // For parsing application/json
 // API Routes
 app.use('/api', foodRoutes);
 
-// Start the server
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
+db.serialize(() => {
+    // Start the server
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on http://0.0.0.0:${PORT}`);
+    });
 });
