@@ -1,10 +1,12 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
+from starlette.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from starlette.responses import FileResponse
 from sqlalchemy.orm import Session
 import json
 from typing import List, Optional
+import uuid
+import os
 
 from src.api import schemas
 from src.core import database
@@ -87,6 +89,28 @@ def update_food(food_id: int, food: schemas.FoodUpdate, db: Session = Depends(ge
     response_food_dict = db_food.__dict__.copy()
     response_food_dict["tags"] = json.loads(db_food.tags) if db_food.tags else []
     return schemas.Food(**response_food_dict)
+
+@app.post("/upload-image")
+async def upload_image(file: UploadFile = File(...)):
+    UPLOAD_DIR = "src/static/images"
+    if not os.path.exists(UPLOAD_DIR):
+        os.makedirs(UPLOAD_DIR)
+
+    file_extension = os.path.splitext(file.filename)[1]
+    unique_filename = f"{uuid.uuid4()}{file_extension}"
+    file_path = os.path.join(UPLOAD_DIR, unique_filename)
+
+    try:
+        with open(file_path, "wb") as buffer:
+            while True:
+                chunk = await file.read(1024)
+                if not chunk:
+                    break
+                buffer.write(chunk)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Could not upload file: {e}")
+
+    return {"filename": unique_filename, "url": f"/static/images/{unique_filename}"}
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="src/static"), name="static")

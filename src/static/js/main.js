@@ -1,4 +1,4 @@
-import { fetchFoods, addFood, deleteFood, updateFood } from './api.js';
+import { fetchFoods, addFood, deleteFood, updateFood, uploadImage } from './api.js';
 import { renderFoodList, filterFoodList, updateTurntableAppearance, spinTurntable, showModal, hideModal } from './ui.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addFoodCloseButton = document.querySelector('.add-food-close-button');
     const newFoodNameInput = document.getElementById('new-food-name');
     const newFoodImageInput = document.getElementById('new-food-image');
+    const newFoodImageFileInput = document.getElementById('new-food-image-file');
     const newFoodLocationInput = document.getElementById('new-food-location');
     const newFoodTagsInput = document.getElementById('new-food-tags');
     const confirmAddFoodButton = document.getElementById('confirm-add-food-button');
@@ -31,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const editFoodIdInput = document.getElementById('edit-food-id');
     const editFoodNameInput = document.getElementById('edit-food-name');
     const editFoodImageInput = document.getElementById('edit-food-image');
+    const editFoodImageFileInput = document.getElementById('edit-food-image-file');
     const editFoodLocationInput = document.getElementById('edit-food-location');
     const editFoodTagsInput = document.getElementById('edit-food-tags');
     const confirmEditFoodButton = document.getElementById('confirm-edit-food-button');
@@ -57,18 +59,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleEditFood = async () => {
         const foodId = editFoodIdInput.value;
         const updatedFoodName = editFoodNameInput.value.trim();
-        const updatedFoodImage = editFoodImageInput.value.trim();
         const updatedFoodLocation = editFoodLocationInput.value.trim();
         const updatedFoodTags = editFoodTagsInput.value.trim().split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+        const updatedFoodImageFile = editFoodImageFileInput.files[0]; // Get the file object
+        const updatedFoodImageUrl = editFoodImageInput.value.trim(); // Get the URL from text input
 
         if (!updatedFoodName) {
             alert('美食名称不能为空！');
             return;
         }
 
+        let imageUrl = updatedFoodImageUrl; // Default to URL from text input
+        if (updatedFoodImageFile) {
+            try {
+                const uploadResponse = await uploadImage(updatedFoodImageFile);
+                imageUrl = uploadResponse.url; // Override with uploaded image URL
+            } catch (error) {
+                console.error('Failed to upload image:', error);
+                alert('图片上传失败，请重试或不上传图片。');
+                return; // Stop if image upload fails
+            }
+        }
+
         try {
-            await updateFood(foodId, { name: updatedFoodName, image: updatedFoodImage, location: updatedFoodLocation, tags: updatedFoodTags });
+            await updateFood(foodId, { name: updatedFoodName, image: imageUrl, location: updatedFoodLocation, tags: updatedFoodTags });
             hideModal(editFoodModal);
+            editFoodImageInput.value = ''; // Clear text input
+            editFoodImageFileInput.value = ''; // Clear file input
             loadAndRenderFoods(); // Reload and render foods after updating
         } catch (error) {
             console.error('Failed to update food in main.js:', error);
@@ -77,25 +94,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleAddFood = async () => {
         const newFoodName = newFoodNameInput.value.trim();
-        const newFoodImage = newFoodImageInput.value.trim();
         const newFoodLocation = newFoodLocationInput.value.trim();
         const newFoodTags = newFoodTagsInput.value.trim().split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+        const newFoodImageFile = newFoodImageFileInput.files[0]; // Get the file object
+        const newFoodImageUrl = newFoodImageInput.value.trim(); // Get the URL from text input
 
         if (!newFoodName) {
             alert('美食名称不能为空！');
             return;
         }
 
+        let imageUrl = newFoodImageUrl; // Default to URL from text input
+        if (newFoodImageFile) {
+            try {
+                const uploadResponse = await uploadImage(newFoodImageFile);
+                imageUrl = uploadResponse.url; // Override with uploaded image URL
+            } catch (error) {
+                console.error('Failed to upload image:', error);
+                alert('图片上传失败，请重试或不上传图片。');
+                return; // Stop if image upload fails
+            }
+        }
+
         try {
-            await addFood({ name: newFoodName, image: newFoodImage, location: newFoodLocation, tags: newFoodTags });
+            await addFood({ name: newFoodName, image: imageUrl, location: newFoodLocation, tags: newFoodTags });
             hideModal(addFoodModal);
             newFoodNameInput.value = '';
-            newFoodImageInput.value = '';
+            newFoodImageInput.value = ''; // Clear text input
+            newFoodImageFileInput.value = ''; // Clear file input
             newFoodLocationInput.value = '';
             newFoodTagsInput.value = '';
             loadAndRenderFoods(); // Reload and render foods after adding
         } catch (error) {
-            // Error handled in api.js, just log here if needed
             console.error('Failed to add food in main.js:', error);
         }
     };

@@ -96,6 +96,21 @@ p {
     margin-bottom: 0.5em;
 }
 
+.food-image.no-image {
+    background-color: #e0e0e0; /* Pure color background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 0.8em;
+    text-align: center;
+    border: 1px dashed #ccc;
+}
+
+.food-image.no-image::before {
+    content: "无图片";
+}
+
 .food-card-content {
     flex-grow: 1;
     display: flex;

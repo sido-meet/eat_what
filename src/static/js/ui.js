@@ -1,5 +1,3 @@
-const DEFAULT_FOOD_IMAGE = 'https://via.placeholder.com/150?text=No+Image';
-
 export const renderFoodList = (foods, foodListElement, deleteCallback) => {
     foodListElement.innerHTML = '';
     foods.forEach((food, index) => {
@@ -7,10 +5,10 @@ export const renderFoodList = (foods, foodListElement, deleteCallback) => {
         li.className = 'food-card';
         li.dataset.id = food.id; // Use food.id instead of index
 
-        const imageUrl = food.image || DEFAULT_FOOD_IMAGE;
+        const imageUrl = food.image; // No default image here
 
         li.innerHTML = `
-            <img src="${imageUrl}" alt="${food.name}" class="food-image">
+            ${imageUrl ? `<img src="${imageUrl}" alt="${food.name}" class="food-image">` : `<div class="food-image no-image"></div>`}
             <div class="food-card-content">
                 <strong class="food-name">${food.name}</strong>
                 <div class="food-details">

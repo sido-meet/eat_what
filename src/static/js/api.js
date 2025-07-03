@@ -78,3 +78,26 @@ export const updateFood = async (foodId, foodData) => {
         throw error; // Re-throw to allow calling function to handle
     }
 };
+
+export const uploadImage = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(`${API_BASE_URL}/upload-image`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        alert(`图片上传失败: ${error.message}`);
+        throw error; // Re-throw to allow calling function to handle
+    }
+};
