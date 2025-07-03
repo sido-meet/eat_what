@@ -2,7 +2,6 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Prevent scrolling */
 }
 
 body {
@@ -10,20 +9,25 @@ body {
     background-color: #f4f4f9;
     color: #333;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column; /* 新增：使子元素垂直堆叠 */
+    justify-content: flex-start; /* 新增：使内容从顶部开始 */
+    align-items: center; /* 保持：水平居中 */
     min-height: 100vh;
     width: 100vw; /* Ensure full width */
 }
 
 .container {
     background: #fff;
-    padding: 2em;
+    padding: 1.5em;
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 500px;
+    width: 95%;
+    margin: 0 auto;
     text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 h1 {
@@ -337,4 +341,81 @@ p {
     font-size: 1.2em;
     font-weight: bold;
     color: #28a745;
+}
+
+/* 针对平板和手机 (屏幕宽度小于或等于 768px) */
+@media (max-width: 768px) {
+    body {
+        align-items: flex-start; /* 让内容从顶部开始，而不是垂直居中 */
+        padding-top: 1em; /* 顶部留白 */
+    }
+
+    .container {
+        padding: 1em;
+        width: 95%;
+    }
+
+    #food-list {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* 调整网格列数 */
+        gap: 0.5em;
+    }
+
+    .food-card {
+        padding: 0.5em;
+    }
+
+    .food-image {
+        height: 80px; /* 调整图片高度 */
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    /* 调整按钮大小 */
+    #open-turntable-button,
+    #open-add-food-modal-button,
+    #confirm-add-food-button,
+    #spin-button {
+        padding: 0.8em;
+        font-size: 1em;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+}
+
+/* 针对手机 (屏幕宽度小于或等于 480px) */
+@media (max-width: 480px) {
+    .container {
+        padding: 0.8em;
+        width: 100%; /* 手机上可以占满宽度 */
+        border-radius: 0; /* 手机上可以移除圆角 */
+        box-shadow: none; /* 手机上可以移除阴影 */
+    }
+
+    #food-list {
+        grid-template-columns: 1fr; /* 手机上单列显示 */
+    }
+
+    .food-image {
+        height: 100px;
+    }
+
+    .food-card {
+        flex-direction: row; /* 手机上卡片内容横向排列 */
+        align-items: center;
+        text-align: left;
+    }
+
+    .food-card-content {
+        margin-left: 0.5em;
+    }
+
+    .delete-button, .edit-button {
+        width: auto; /* 按钮不再占满宽度 */
+        margin-left: auto; /* 推到右边 */
+    }
 }
