@@ -140,12 +140,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('无法删除美食：美食信息不完整。');
                     return;
                 }
-                try {
-                    await deleteFood(foodId);
-                    alert('美食删除成功！');
-                    loadAndRenderFoods(); // Reload and render foods after deleting
-                } catch (error) {
-                    console.error('Failed to delete food in main.js:', error);
+                if (confirm('确定要删除这道美食吗？')) {
+                    try {
+                        await deleteFood(foodId);
+                        alert('美食删除成功！');
+                        loadAndRenderFoods(); // Reload and render foods after deleting
+                    } catch (error) {
+                        console.error('Failed to delete food in main.js:', error);
+                    }
                 }
             }
         }
