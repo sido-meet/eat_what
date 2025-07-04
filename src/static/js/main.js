@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const turntableCloseButton = document.querySelector('#turntable-modal .close-button');
     const spinButton = document.getElementById('spin-button');
     const turntable = document.getElementById('turntable');
-    const resultDisplay = document.getElementById('result');
+    const resultDisplay = document.querySelector('#result-display-area #result');
 
     // New elements for Add Food Modal
     const openAddFoodModalButton = document.getElementById('open-add-food-modal-button');
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', () => filterFoodList(searchInput, foodList));
 
     openTurntableButton.addEventListener('click', () => {
-        updateTurntableAppearance(foods, turntable, 0); // Pass 0 for initial rotation
+        updateTurntableAppearance(foods, turntable);
         resultDisplay.textContent = '';
         showModal(turntableModal);
     });

@@ -293,47 +293,81 @@ p {
     width: 300px;
     height: 300px;
     margin: 2em auto;
+    border-radius: 50%;
+    overflow: hidden; /* Ensure sectors don't overflow */
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    display: flex; /* Use flexbox for sector layout */
+    flex-wrap: wrap; /* Allow sectors to wrap */
 }
 
 #turntable {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 5px solid #ccc;
-    background: conic-gradient(red 0% 25%, blue 25% 50%, green 50% 75%, yellow 75% 100%);
-    transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
-    position: relative; /* Added for positioning labels */
+    transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); /* Smooth deceleration */
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.turntable-sector {
+    width: 50%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    border: 1px solid #eee; /* Separator for sectors */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    background-color: #f9f9f9; /* Default background for sectors */
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.turntable-sector.highlight {
+    background-color: #ffe082; /* Highlight color */
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
 }
 
 #pointer {
     position: absolute;
-    top: 50%;
+    top: 0; /* Tip of the arrow at the top edge of the turntable container */
     left: 50%;
-    transform: translate(-50%, -100%);
+    transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-top: 30px solid #333;
-    z-index: 10;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 25px solid #e74c3c; /* Red pointer, pointing downwards */
+    z-index: 100; /* Above everything */
+    transform-origin: 50% 150px; /* Rotate around the center of the turntable (150px from top of container) */
 }
 
-/* Food Label on Turntable */
-.food-label {
+#result-display-area {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform-origin: 0% 0%; /* Rotate around the center of the turntable */
-    font-size: 0.8em;
+    transform: translate(-50%, -50%);
+    z-index: 50; /* Above turntable, below pointer */
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+#result-display-area p {
+    margin: 0;
+    font-size: 1.2em;
     font-weight: bold;
     color: #333;
-    white-space: nowrap;
-    text-align: center;
-    padding: 5px;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 3px;
-    pointer-events: none; /* Allow clicks to pass through to the turntable */
-    transform: translate(-50%, -50%); /* Center the label */
 }
 
 #spin-button {

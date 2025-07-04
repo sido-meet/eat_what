@@ -39,40 +39,22 @@ export const filterFoodList = (searchInput, foodListElement) => {
     });
 };
 
-export const updateTurntableAppearance = (foods, turntableElement, currentRotation) => {
-    const itemCount = foods.length;
-    if (itemCount === 0) return;
-    const angleStep = 360 / itemCount;
-    const colors = ['#ffadad', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#a0c4ff', '#bdb2ff', '#ffc6ff'];
-    
-    let gradient = 'conic-gradient(';
-    foods.forEach((food, i) => {
-        const startAngle = i * angleStep;
-        const endAngle = (i + 1) * angleStep;
-        gradient += `${colors[i % colors.length]} ${startAngle}deg ${endAngle}deg`;
-        if (i < itemCount - 1) {
-            gradient += ', ';
+export const updateTurntableAppearance = (foods, turntableElement) => {
+    turntableElement.innerHTML = ''; // Clear existing content
+
+    // Create 4 fixed sectors
+    for (let i = 0; i < 4; i++) {
+        const sector = document.createElement('div');
+        sector.className = 'turntable-sector';
+        sector.id = `sector-${i}`;
+        if (foods.length > 0) {
+            const randomFood = foods[Math.floor(Math.random() * foods.length)];
+            sector.textContent = randomFood.name;
+        } else {
+            sector.textContent = '添加美食'; // Default text if no foods
         }
-    });
-    gradient += ')';
-    turntableElement.style.transform = `rotate(${currentRotation}deg)`;
-
-    const existingLabels = turntableElement.querySelectorAll('.food-label');
-    existingLabels.forEach(label => label.remove());
-
-    foods.forEach((food, i) => {
-        const angle = (i + 0.5) * angleStep;
-        const label = document.createElement('div');
-        label.className = 'food-label';
-        label.textContent = food.name;
-        
-        const radius = turntableElement.offsetWidth / 2 - 30; 
-        const x = radius * Math.cos(angle * Math.PI / 180);
-        const y = radius * Math.sin(angle * Math.PI / 180);
-        
-        label.style.transform = `translate(${x}px, ${y}px) rotate(${angle + 90}deg)`;
-        turntableElement.appendChild(label);
-    });
+        turntableElement.appendChild(sector);
+    }
 };
 
 export const spinTurntable = (foods, turntableElement, resultDisplayElement, spinButtonElement) => {
@@ -84,17 +66,78 @@ export const spinTurntable = (foods, turntableElement, resultDisplayElement, spi
     resultDisplayElement.textContent = '...';
     spinButtonElement.disabled = true;
 
-    const randomIndex = Math.floor(Math.random() * foods.length);
-    const selectedFood = foods[randomIndex];
-    const degreesPerItem = 360 / foods.length;
-    const targetRotation = 360 * 5 + (360 - (randomIndex * degreesPerItem + degreesPerItem / 2));
-    
-    turntableElement.style.transform = `rotate(${targetRotation}deg)`;
+    const sectors = Array.from(turntableElement.querySelectorAll('.turntable-sector'));
+    sectors.forEach(sector => sector.classList.remove('highlight'));
+
+    const pointerElement = document.getElementById('pointer');
+
+    // 1. Pre-select the final winning food and its sector
+    const finalSelectedFood = foods[Math.floor(Math.random() * foods.length)];
+    const finalSelectedSectorIndex = Math.floor(Math.random() * sectors.length);
+
+    let flashInterval;
+    let flashCount = 0;
+    const totalFlashDuration = 3000; // Flash for 3 seconds
+    const flashSpeed = 100; // Flash every 100ms
+
+    // Start flashing food names
+    flashInterval = setInterval(() => {
+        const flashDurationElapsed = flashCount;
+        const isSettlingPhase = flashDurationElapsed >= totalFlashDuration * 0.8; // Last 20% of flash duration
+
+        sectors.forEach((sector, index) => {
+            if (isSettlingPhase && index === finalSelectedSectorIndex) {
+                sector.textContent = finalSelectedFood.name; // Settle the final food in its sector
+            } else {
+                const randomFood = foods[Math.floor(Math.random() * foods.length)];
+                sector.textContent = randomFood.name;
+            }
+        });
+        flashCount += flashSpeed;
+        if (flashCount >= totalFlashDuration) {
+            clearInterval(flashInterval);
+        }
+    }, flashSpeed);
+
+    // Spin the pointer
+    const totalSpinDuration = 4000; // Spin for 4 seconds
+
+    // Define target angles for each sector (center of the sector's angular range)
+    // Sector 0 (Top-Left): 270-360/0 -> center 315
+    // Sector 1 (Top-Right): 0-90 -> center 45
+    // Sector 2 (Bottom-Left): 180-270 -> center 225
+    // Sector 3 (Bottom-Right): 90-180 -> center 135
+    const sectorTargetAngles = [315, 45, 225, 135];
+    const targetAngleForPointer = sectorTargetAngles[finalSelectedSectorIndex];
+
+    // Add multiple full rotations to make it spin, and then land on the target angle
+    // Add a small random offset to make it feel less predictable, but still within the sector
+    const finalPointerRotation = 360 * 5 + targetAngleForPointer + (Math.random() * 30 - 15); // +/- 15 degrees wobble
+
+    pointerElement.style.transition = 'none'; // Reset transition
+    pointerElement.style.transform = `translateX(-50%) rotate(0deg)`; // Reset pointer rotation
 
     setTimeout(() => {
-        resultDisplayElement.textContent = `结果: ${selectedFood.name}`;
+        pointerElement.style.transition = `transform ${totalSpinDuration / 1000}s cubic-bezier(0.25, 0.1, 0.25, 1)`;
+        pointerElement.style.transform = `translateX(-50%) rotate(${finalPointerRotation}deg)`;
+    }, 50); // Small delay to ensure transition reset takes effect
+
+    // Determine and display final result after spin and flash
+    setTimeout(() => {
+        clearInterval(flashInterval); // Ensure flashing stops
+
+        sectors.forEach((sector, index) => {
+            if (index === finalSelectedSectorIndex) { // Use finalSelectedSectorIndex directly
+                sector.textContent = finalSelectedFood.name;
+                sector.classList.add('highlight');
+            } else {
+                sector.textContent = ''; // Clear other sectors
+            }
+        });
+
+        resultDisplayElement.innerHTML = `<span style="font-size: 64px">😋</span>`;
         spinButtonElement.disabled = false;
-    }, 4000); 
+    }, Math.max(totalFlashDuration, totalSpinDuration) + 500); // Wait for both flash and spin to complete + buffer
 };
 
 export const showModal = (modalElement) => {
