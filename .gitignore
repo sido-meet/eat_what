@@ -9,6 +9,8 @@ __pycache__/
 # uv
 
 # Database
+*.sqlite
+*.sqlite3
 
 # Logs
 *.log
@@ -21,6 +23,9 @@ Thumbs.db
 # IDEs
 .idea/
 .vscode/
+
+# Uploaded images
+src/static/images/
 
 # Other
 app.log
