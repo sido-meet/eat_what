@@ -29,3 +29,5 @@ src/static/images/
 
 # Other
 app.log
+
+.ruff_cache/
